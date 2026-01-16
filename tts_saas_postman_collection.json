@@ -1,0 +1,424 @@
+{
+  "info": {
+    "name": "TTS SaaS API Collection",
+    "description": "Complete API collection for TTS SaaS backend with 37 endpoints - Test in sequence",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://127.0.0.1:5000"},
+    {"key": "user_token", "value": ""},
+    {"key": "admin_token", "value": ""},
+    {"key": "user_id", "value": "1"},
+    {"key": "audio_id", "value": "1"}
+  ],
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"user_type\": \"user\"\n}"
+        },
+        "url": {"raw": "http://127.0.0.1:5000/api/auth/register", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "auth", "register"]}
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    pm.environment.set('user_token', response.token);",
+              "    pm.environment.set('user_id', response.user.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+        },
+        "url": {"raw": "{{base_url}}/api/auth/login", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "auth", "login"]}
+      }
+    },
+    {
+      "name": "Auth - Logout",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/auth/logout", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "auth", "logout"]}
+      }
+    },
+    {
+      "name": "Auth - Verify Token",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/auth/verify-token", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "auth", "verify-token"]}
+      }
+    },
+    {
+      "name": "Auth - Admin Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    pm.environment.set('admin_token', response.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\"\n}"
+        },
+        "url": {"raw": "{{base_url}}/api/auth/admin/login", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "auth", "admin", "login"]}
+      }
+    },
+    {
+      "name": "Auth - Change Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"old_password\": \"oldpass\",\n    \"new_password\": \"newpass\"\n}"
+        },
+        "url": {"raw": "http://127.0.0.1:5000/api/auth/change-password", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "auth", "change-password"]}
+      }
+    },
+    {
+      "name": "Voice - Generate TTS",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    pm.environment.set('audio_id', response.audio_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{user_token}}"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"text\": \"Hello world\"\n}"
+        },
+        "url": {"raw": "{{base_url}}/api/voice/generate", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "voice", "generate"]}
+      }
+    },
+    {
+      "name": "Voice - Download Audio",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{user_token}}"}],
+        "url": {"raw": "{{base_url}}/api/voice/download/{{audio_id}}", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "voice", "download", "{{audio_id}}"]}
+      }
+    },
+    {
+      "name": "Voice - Clone Voice",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "body": {"mode": "formdata","formdata": [{"key": "voice_file","type": "file","src": "path/to/voice.wav"},{"key": "voice_name","type": "text","value": "MyVoice"}]},
+        "url": {"raw": "http://127.0.0.1:5000/api/voice/clone-voice", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "voice", "clone-voice"]}
+      }
+    },
+    {
+      "name": "Voice - List Voices",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/voice/voices?search=MyVoice", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "voice", "voices"], "query": [{"key": "search", "value": "MyVoice"}]}
+      }
+    },
+    {
+      "name": "Voice - Get Languages",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/voice/languages", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "voice", "languages"]}
+      }
+    },
+    {
+      "name": "Voice - Get Styles",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/voice/styles", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "voice", "styles"]}
+      }
+    },
+    {
+      "name": "User - Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/user/dashboard", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "user", "dashboard"]}
+      }
+    },
+    {
+      "name": "User - Profile",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/user/profile", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "user", "profile"]}
+      }
+    },
+    {
+      "name": "User - Voice History",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/user/voice-history", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "user", "voice-history"]}
+      }
+    },
+    {
+      "name": "User - Download Audio",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"audio_id\": 1\n}"
+        },
+        "url": {"raw": "http://127.0.0.1:5000/api/user/download-audio", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "user", "download-audio"]}
+      }
+    },
+    {
+      "name": "Admin - Assign Plan",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{admin_token}}"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"user@example.com\",\n    \"plan_id\": 1\n}"
+        },
+        "url": {"raw": "{{base_url}}/api/admin/assign-plan", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "assign-plan"]}
+      }
+    },
+    {
+      "name": "Admin - Reset Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{admin_token}}"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"user@example.com\",\n    \"new_password\": \"newpass123\"\n}"
+        },
+        "url": {"raw": "{{base_url}}/api/admin/reset-password", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "reset-password"]}
+      }
+    },
+    {
+      "name": "Admin - Stats",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+        "url": {"raw": "{{base_url}}/api/admin/stats", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "stats"]}
+      }
+    },
+    {
+      "name": "Admin - Users (with pagination)",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+        "url": {"raw": "{{base_url}}/api/admin/users?page=1&per_page=10&search=", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "users"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "10"}, {"key": "search", "value": ""}]}
+      }
+    },
+    {
+      "name": "Admin - Update User",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{admin_token}}"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"user_type\": \"user\",\n    \"plan_id\": 2\n}"
+        },
+        "url": {"raw": "{{base_url}}/api/admin/users/{{user_id}}", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "users", "{{user_id}}"]}
+      }
+    },
+    {
+      "name": "Admin - Delete User",
+      "request": {
+        "method": "DELETE",
+        "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+        "url": {"raw": "{{base_url}}/api/admin/users/{{user_id}}", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "users", "{{user_id}}"]}
+      }
+    },
+    {
+      "name": "Admin - Recent Activity",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+        "url": {"raw": "{{base_url}}/api/admin/recent-activity?limit=20", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "recent-activity"], "query": [{"key": "limit", "value": "20"}]}
+      }
+    },
+    {
+      "name": "Admin - Messages (with pagination)",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+        "url": {"raw": "{{base_url}}/api/admin/messages?page=1&per_page=10", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "messages"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "10"}]}
+      }
+    },
+    {
+      "name": "Admin - Get Plans",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+        "url": {"raw": "{{base_url}}/api/admin/plans", "protocol": "http", "host": ["{{base_url}}"], "path": ["api", "admin", "plans"]}
+      }
+    },
+    {
+      "name": "Translation - Translate",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}
+        ],
+        "body": {"mode": "raw", "raw": "{\n    \"text\": \"Hello world\",\n    \"language\": \"fr\"\n}"},
+        "url": {"raw": "http://127.0.0.1:5000/api/translate/translate", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "translate", "translate"]}
+      }
+    },
+    {
+      "name": "Subscriptions - Plans",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/subscriptions/plans", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "subscriptions", "plans"]}
+      }
+    },
+    {
+      "name": "Subscriptions - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"plan_id\": 1\n}"
+        },
+        "url": {"raw": "http://127.0.0.1:5000/api/subscriptions/create", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "subscriptions", "create"]}
+      }
+    },
+    {
+      "name": "Subscriptions - User Subscription",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/subscriptions/user/1", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "subscriptions", "user", "1"]}
+      }
+    },
+    {
+      "name": "Subscriptions - Cancel",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"subscription_id\": 1\n}"
+        },
+        "url": {"raw": "http://127.0.0.1:5000/api/subscriptions/cancel", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "subscriptions", "cancel"]}
+      }
+    },
+    {
+      "name": "Contact - Submit",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"subject\": \"Inquiry\",\n    \"message\": \"Hello, I have a question.\"\n}"
+        },
+        "url": {"raw": "http://127.0.0.1:5000/api/contact/submit", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "contact", "submit"]}
+      }
+    },
+    {
+      "name": "Tokens - Usage",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/tokens/usage/1", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "tokens", "usage", "1"]}
+      }
+    },
+    {
+      "name": "Tokens - Consume",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"characters\": 100\n}"
+        },
+        "url": {"raw": "http://127.0.0.1:5000/api/tokens/consume", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "tokens", "consume"]}
+      }
+    },
+    {
+      "name": "Files - Upload",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "body": {"mode": "formdata","formdata": [{"key": "file","type": "file","src": "path/to/file.txt"}]},
+        "url": {"raw": "http://127.0.0.1:5000/api/files/upload", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "files", "upload"]}
+      }
+    },
+    {
+      "name": "Files - Download",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer <JWT_TOKEN>"}],
+        "url": {"raw": "http://127.0.0.1:5000/api/files/download/path/to/file.txt", "protocol": "http", "host": ["127.0.0.1"], "port": "5000", "path": ["api", "files", "download", "path", "to", "file.txt"]}
+      }
+    }
+  ]
+}

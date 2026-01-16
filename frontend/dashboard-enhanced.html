@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Generator Dashboard - MyVoiceAI</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    /* Additional styles for new features */
+    .tabs-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .tab-button {
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: #6c757d;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tab-button.active {
+      color: #4ecca3;
+      border-bottom-color: #4ecca3;
+    }
+
+    .tab-button:hover {
+      color: #4ecca3;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .translation-result {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      min-height: 100px;
+    }
+
+    .translation-result.has-content {
+      background: #e8f5f1;
+      border-color: #4ecca3;
+    }
+
+    .language-pair {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .language-select {
+      flex: 1;
+    }
+
+    .swap-button {
+      background: #4ecca3;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s;
+    }
+
+    .swap-button:hover {
+      transform: rotate(180deg);
+    }
+
+    .upload-area {
+      border: 2px dashed #4ecca3;
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .upload-area:hover {
+      background: #e8f5f1;
+      border-color: #3dbb8f;
+    }
+
+    .upload-area.drag-over {
+      background: #e8f5f1;
+      border-color: #3dbb8f;
+      transform: scale(1.02);
+    }
+
+    .voice-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: all 0.3s;
+    }
+
+    .voice-item:hover {
+      background: #e9ecef;
+      transform: translateX(5px);
+    }
+
+    .voice-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-button {
+      background: transparent;
+      border: none;
+      color: #6c757d;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+
+    .icon-button:hover {
+      background: #4ecca3;
+      color: white;
+    }
+
+    .health-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .health-status.healthy {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .health-status.unhealthy {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #28a745;
+    }
+
+    .status-indicator.offline {
+      background: #dc3545;
+    }
+
+    .combined-mode {
+      background: linear-gradient(135deg, #e8f5f1 0%, #f0e8f5 100%);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .feature-badge {
+      display: inline-block;
+      background: #4ecca3;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div>
+      <b>
+        <img src="assests/logo.png" alt="Logo" style="width:32px;height:auto; position:relative; top:6px;">
+        <span style="color:#ffffff;">Raket.H </span>
+        <span style="color:#f5751f;"> Clone</span>
+      </b>
+    </div>
+
+    <div class="user-info">
+      <span id="welcomeMessage">Welcome, User</span>
+      <div class="profile-pic-container" style="position: relative; cursor: pointer;" onclick="openProfileModal()"
+        onmouseover="this.querySelector('.edit-overlay').style.opacity='1'"
+        onmouseout="this.querySelector('.edit-overlay').style.opacity='0'">
+        <div id="profilePic"
+          style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #4ecca3; background: #4ecca3; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: bold;">
+          U</div>
+        <div class="online-status"
+          style="position: absolute; bottom: 3px; right: 3px; background: #00ff00; border: 2px solid white; border-radius: 50%; width: 12px; height: 12px;">
+        </div>
+        <div class="edit-overlay"
+          style="position: absolute; bottom: -2px; right: -2px; background: #4ecca3; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s;">
+          <i class="fas fa-edit" style="color: white; font-size: 8px;"></i>
+        </div>
+      </div>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" onclick="goHome()">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16,17 21,12 16,7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="main-content">
+      <!-- Health Status -->
+      <div id="healthStatus" class="health-status">
+        <div class="status-indicator"></div>
+        <span>Checking system status...</span>
+      </div>
+
+      <div class="status-card">
+        <div class="status-header">
+          <div class="project-name">MyVoiceAI</div>
+          <div class="status-badge">Active</div>
+        </div>
+        <div class="token-info">
+          <div class="token-stat">
+            <div class="token-number" id="usedChars">0</div>
+            <div class="token-label">Character Used</div>
+          </div>
+          <div class="token-stat">
+            <div class="token-number" id="totalChars">60000</div>
+            <div class="token-label">Total Character</div>
+          </div>
+        </div>
+        <div class="progress-container">
+          <div class="progress-label" id="usageLabel">Usage: 0%</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="tabs-container">
+        <button class="tab-button active" onclick="switchTab('tts')">
+          Text-to-Speech
+        </button>
+        <button class="tab-button" onclick="switchTab('translation')">
+          Translation
+        </button>
+        <button class="tab-button" onclick="switchTab('combined')">
+          Translate & TTS
+          <span class="feature-badge">NEW</span>
+        </button>
+        <button class="tab-button" onclick="switchTab('voices')">
+          Voice Cloning
+        </button>
+      </div>
+
+      <!-- TTS Tab -->
+      <div id="ttsTab" class="tab-content active">
+        <div class="generator-card">
+          <h2 class="card-title">Text-to-Speech Generator</h2>
+
+          <div class="form-group">
+            <label class="form-label">Text to Generate</label>
+            <textarea class="textarea" id="textInput" placeholder="Enter your text here to generate voice..."
+              oninput="updateCharacterCount()"></textarea>
+            <div class="character-counter">
+              <span id="characterCounter">0 characters</span>
+              <span id="remainingCounter" style="margin-left: 15px; color: #4ecca3;">Remaining: 60000</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">TTS Language</label>
+            <select class="textarea" id="ttsLanguage" style="padding: 12px;">
+              <!-- Will be populated dynamically -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Speaker/Voice</label>
+            <select class="textarea" id="speakerId" style="padding: 12px;">
+              <option value="default">Default Voice</option>
+              <!-- Will be populated with cloned voices -->
+            </select>
+          </div>
+
+          <div class="form-group" id="audioPreview">
+            <label class="form-label">Generated Voice Preview</label>
+            <div class="audio-player">
+              <audio controls style="width: 100%; border-radius: 8px;" disabled>
+                <source src="" type="audio/mpeg">
+                Your browser does not support the audio element.
+              </audio>
+              <div class="audio-placeholder"
+                style="text-align: center; color: #999; font-style: italic; margin-top: 10px;">Generate voice to
+                preview audio</div>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button type="button" class="btn btn-primary" onclick="return generateVoiceTTS(event)">Generate
+              Voice</button>
+            <button type="button" class="btn btn-secondary" onclick="return downloadMP3(event)">Download Audio</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Translation Tab -->
+      <div id="translationTab" class="tab-content">
+        <div class="generator-card">
+          <h2 class="card-title">Text Translation</h2>
+
+          <div class="form-group">
+            <label class="form-label">Text to Translate</label>
+            <textarea class="textarea" id="translateInput" placeholder="Enter text to translate..."
+              rows="5"></textarea>
+          </div>
+
+          <div class="language-pair">
+            <div class="language-select">
+              <label class="form-label">Source Language</label>
+              <select class="textarea" id="srcLang" style="padding: 12px;">
+                <!-- Will be populated dynamically -->
+              </select>
+            </div>
+
+            <button class="swap-button" onclick="swapLanguages()" title="Swap languages">
+              ⇄
+            </button>
+
+            <div class="language-select">
+              <label class="form-label">Target Language</label>
+              <select class="textarea" id="tgtLang" style="padding: 12px;">
+                <!-- Will be populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button type="button" class="btn btn-primary" onclick="translateText()">Translate</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Translation Result</label>
+            <div class="translation-result" id="translationResult">
+              <div style="color: #999; font-style: italic;">Translation will appear here...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Combined Translation & TTS Tab -->
+      <div id="combinedTab" class="tab-content">
+        <div class="generator-card">
+          <div class="combined-mode">
+            <h2 class="card-title">🎯 Translate & Generate Speech</h2>
+            <p style="color: #6c757d; margin-top: 10px;">Translate your text and generate voice in one step!</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Text to Translate & Speak</label>
+            <textarea class="textarea" id="combinedInput" placeholder="Enter text to translate and convert to speech..."
+              rows="5"></textarea>
+          </div>
+
+          <div class="language-pair">
+            <div class="language-select">
+              <label class="form-label">Source Language</label>
+              <select class="textarea" id="combinedSrcLang" style="padding: 12px;">
+                <!-- Will be populated dynamically -->
+              </select>
+            </div>
+
+            <button class="swap-button" onclick="swapCombinedLanguages()" title="Swap languages">
+              ⇄
+            </button>
+
+            <div class="language-select">
+              <label class="form-label">Target Language</label>
+              <select class="textarea" id="combinedTgtLang" style="padding: 12px;">
+                <!-- Will be populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">TTS Language</label>
+            <select class="textarea" id="combinedTtsLang" style="padding: 12px;">
+              <!-- Will be populated dynamically -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Speaker/Voice</label>
+            <select class="textarea" id="combinedSpeaker" style="padding: 12px;">
+              <option value="default">Default Voice</option>
+              <!-- Will be populated with cloned voices -->
+            </select>
+          </div>
+
+          <div class="button-group">
+            <button type="button" class="btn btn-primary" onclick="translateAndGenerateTTS()">Translate & Generate
+              Voice</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Translation Result</label>
+            <div class="translation-result" id="combinedTranslationResult">
+              <div style="color: #999; font-style: italic;">Translation will appear here...</div>
+            </div>
+          </div>
+
+          <div class="form-group" id="combinedAudioPreview" style="display: none;">
+            <label class="form-label">Generated Voice Preview</label>
+            <div class="audio-player">
+              <audio controls style="width: 100%; border-radius: 8px;">
+                <source src="" type="audio/mpeg">
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          </div>
+
+          <div class="button-group" id="combinedDownloadBtn" style="display: none;">
+            <button type="button" class="btn btn-secondary" onclick="downloadCombinedAudio()">Download Audio</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voice Cloning Tab -->
+      <div id="voicesTab" class="tab-content">
+        <div class="generator-card">
+          <h2 class="card-title">Voice Cloning Library</h2>
+
+          <div class="form-group">
+            <label class="form-label">Upload Voice for Cloning</label>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('voiceFileInput').click()">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4ecca3" stroke-width="2"
+                style="margin: 0 auto 10px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <p style="color: #4ecca3; font-weight: 500; margin: 5px 0;">Click to upload or drag and drop</p>
+              <p style="color: #6c757d; font-size: 14px;">WAV, MP3, FLAC, or OGG (Max 10MB)</p>
+              <p id="selectedFileName" style="color: #4ecca3; font-weight: 500; margin-top: 10px;"></p>
+            </div>
+            <input type="file" id="voiceFileInput" accept=".wav,.mp3,.flac,.ogg" style="display: none;"
+              onchange="handleVoiceFileSelect(event)">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">User ID</label>
+            <input type="text" class="textarea" id="voiceUserId" placeholder="Enter user ID for this voice"
+              style="padding: 12px;">
+          </div>
+
+          <div class="button-group">
+            <button type="button" class="btn btn-primary" onclick="uploadVoice()">Upload Voice</button>
+          </div>
+
+          <div class="form-group" style="margin-top: 30px;">
+            <label class="form-label">Available Voices</label>
+            <div id="voicesList">
+              <p style="color: #999; font-style: italic; text-align: center; padding: 20px;">Loading voices...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Edit Modal -->
+  <div id="profileModal" class="modal"
+    style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto;">
+    <div class="modal-content"
+      style="background-color: #fefefe; margin: 2% auto; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; position: relative; max-height: 90vh; overflow-y: auto;">
+      <span class="close" onclick="closeProfileModal()"
+        style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: sticky; top: 0; z-index: 1001;">&times;</span>
+      <h2 style="color: #333; margin-bottom: 25px;"><i class="fas fa-user-edit"></i> Edit Profile</h2>
+
+      <form id="profileForm" onsubmit="return false;">
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500;">Profile Picture</label>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <div id="modalProfilePic"
+              style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4ecca3; background: #4ecca3; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: bold;">
+              U</div>
+            <input type="file" id="profilePicInput" accept="image/*" style="display: none;"
+              onchange="previewProfilePic()">
+            <button type="button" onclick="document.getElementById('profilePicInput').click()"
+              style="background: #4ecca3; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Change
+              Photo</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500;">Full Name</label>
+          <input type="text" id="editName"
+            style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 16px;"
+            required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500;">Email</label>
+          <input type="email" id="editEmail"
+            style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 16px; background-color: #f8f9fa; cursor: not-allowed;"
+            readonly>
+        </div>
+
+        <div style="display: flex; gap: 15px; justify-content: flex-end;">
+          <button type="button" onclick="closeProfileModal()"
+            style="background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer;">Cancel</button>
+          <button type="submit"
+            style="background: #4ecca3; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer;">Save
+            Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Raket.H Clone. All rights reserved.</p>
+      <p>Powered by Elevate X Crew</p>
+    </div>
+  </footer>
+
+  <script src="js/dashboard-enhanced.js"></script>
+</body>
+
+</html>

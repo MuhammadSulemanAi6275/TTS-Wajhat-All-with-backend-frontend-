@@ -1,0 +1,661 @@
+{
+	"info": {
+		"_postman_id": "0678ed6a-2969-4249-b72d-842214307f1c",
+		"name": "Translation & TTS API",
+		"description": "Postman collection for Translation and Multilingual TTS API with Voice Cloning",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50593624",
+		"_collection_link": "https://ans-soft-dev-1703065.postman.co/workspace/Muhammad-Anas's-Workspace~0f9afc37-56b0-4cb6-8580-72b7ece02d21/collection/50593624-0678ed6a-2969-4249-b72d-842214307f1c?action=share&source=collection_link&creator=50593624"
+	},
+	"item": [
+		{
+			"name": "Translation",
+			"item": [
+				{
+					"name": "Translate Text",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Hello, how are you?\",\n    \"src_lang\": \"eng_Latn\",\n    \"tgt_lang\": \"deu_Latn\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"translate"
+							]
+						},
+						"description": "Translate text from source language to target language using NLLB-200 model.\n\n**Example language codes:**\n- English: `eng_Latn`\n- Urdu: `urd_Arab`\n- Hindi: `hin_Deva`\n- Spanish: `spa_Latn`\n- French: `fra_Latn`\n- Arabic: `ara_Arab`"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"Hello, how are you?\",\n    \"src_lang\": \"eng_Latn\",\n    \"tgt_lang\": \"urd_Arab\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/translate",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"translate"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"translated_text\": \"میرا نام محمد علی ہے\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Translation endpoints using NLLB-200 model"
+		},
+		{
+			"name": "Text-to-Speech",
+			"item": [
+				{
+					"name": "Synthesize Speech (Default Voice)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Hello, this is a test of the text to speech system.\",\n    \"language\": \"en\",\n    \"speaker_id\": \"default\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/tts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tts"
+							]
+						},
+						"description": "Synthesize speech from text using XTTS-v2 with default voice.\n\n**Supported languages:** en, es, fr, de, it, pt, pl, tr, ru, nl, cs, ar, zh, ja, hu, ko"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"Hello, this is a test.\",\n    \"language\": \"en\",\n    \"speaker_id\": \"default\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/tts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"tts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"audio_path\": \"/audio/abc123def456.wav\",\n    \"file_path\": \"app/storage/audio/abc123def456.wav\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Synthesize Speech (Cloned Voice)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Time is the most valuable resource we have, yet it is the one we often take for granted. Every moment that passes is gone forever, never to return, and how we choose to use it defines the course of our lives. Wasting time is not just idleness; it is the silent thief that robs us of our dreams, our growth, and our opportunities. Procrastination, distraction, and hesitation may feel harmless in the moment, but they accumulate, leaving us with regrets that no amount of wishing can erase. True success and fulfillment come from purposeful action, from investing our energy in things that matter, from learning, creating, and moving steadily toward our goals. Each day is a chance to improve, to connect, to explore, and to leave a mark, but if we squander it, we lose more than hours—we lose the potential of what we could become. Time waits for no one, and life is far too short to spend on things that do not matter. Use your moments wisely, focus on what truly matters, and make every second count, because the way you spend your time shapes the story of your life.\",\n    \"language\": \"en\",\n    \"speaker_id\": \"user_1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/tts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tts"
+							]
+						},
+						"description": "Synthesize speech using a cloned voice. The speaker_id must match a user_id that has uploaded a voice file."
+					},
+					"response": []
+				}
+			],
+			"description": "Text-to-Speech endpoints using XTTS-v2 model"
+		},
+		{
+			"name": "Translate & TTS",
+			"item": [
+				{
+					"name": "Translate and Synthesize (With Translation)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Hello, how are you?\",\n    \"src_lang\": \"eng_Latn\",\n    \"tgt_lang\": \"urd_Arab\",\n    \"language\": \"en\",\n    \"speaker_id\": \"user_123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/translate-tts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"translate-tts"
+							]
+						},
+						"description": "Translate text from source language to target language, then synthesize speech.\n\n**Translation parameters (optional):**\n- `src_lang`: Source language code (e.g., 'eng_Latn')\n- `tgt_lang`: Target language code (e.g., 'urd_Arab')\n\n**TTS parameters (required):**\n- `text`: Text to process\n- `language`: Target language for TTS (e.g., 'en', 'ur', 'hi')\n- `speaker_id`: User ID for voice cloning (default: 'default')\n\nIf `src_lang` and `tgt_lang` are provided, translation will be performed first, then TTS will be applied to the translated text."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"Hello, how are you?\",\n    \"src_lang\": \"eng_Latn\",\n    \"tgt_lang\": \"urd_Arab\",\n    \"language\": \"ur\",\n    \"speaker_id\": \"default\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/translate-tts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"translate-tts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"audio_path\": \"/audio/abc123def456.wav\",\n    \"file_path\": \"app/storage/audio/abc123def456.wav\",\n    \"translated_text\": \"ہیلو، آپ کیسے ہیں؟\",\n    \"original_text\": \"Hello, how are you?\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Translate and Synthesize (TTS Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Hello, this is a test of the combined endpoint.\",\n    \"language\": \"en\",\n    \"speaker_id\": \"user_123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/translate-tts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"translate-tts"
+							]
+						},
+						"description": "Synthesize speech without translation. If `src_lang` and `tgt_lang` are not provided, only TTS will be applied to the original text.\n\nThis is useful when you want to use the same endpoint for both translation+TTS and TTS-only scenarios."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"Hello, this is a test.\",\n    \"language\": \"en\",\n    \"speaker_id\": \"user_123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/translate-tts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"translate-tts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"audio_path\": \"/audio/xyz789abc123.wav\",\n    \"file_path\": \"app/storage/audio/xyz789abc123.wav\",\n    \"original_text\": \"Hello, this is a test.\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Combined Translation and TTS endpoint. Translation is optional - if translation parameters are provided, text will be translated first, then TTS will be applied."
+		},
+		{
+			"name": "Voice Cloning",
+			"item": [
+				{
+					"name": "Upload Voice",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user_id",
+									"value": "user_123",
+									"description": "User identifier for voice cloning",
+									"type": "text"
+								},
+								{
+									"key": "voice_file",
+									"description": "Voice file (.wav, .mp3, .flac, or .ogg)",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/voice/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voice",
+								"upload"
+							]
+						},
+						"description": "Upload a voice file for voice cloning. The voice will be saved under the user_id directory and can be used later for TTS synthesis."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "user_id",
+											"value": "user_123",
+											"type": "text"
+										},
+										{
+											"key": "voice_file",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/voice/upload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"voice",
+										"upload"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Voice uploaded successfully\",\n    \"user_id\": \"user_123\",\n    \"path\": \"app/storage/voices/user_123/voice.wav\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List Voices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/voice/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voice",
+								"list"
+							]
+						},
+						"description": "List all available cloned voices that have been uploaded."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/voice/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"voice",
+										"list"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"voices\": [\n        {\n            \"user_id\": \"user_123\",\n            \"path\": \"app/storage/voices/user_123/voice.wav\",\n            \"available\": true\n        },\n        {\n            \"user_id\": \"user_456\",\n            \"path\": \"app/storage/voices/user_456/voice.wav\",\n            \"available\": true\n        }\n    ]\n}"
+						}
+					]
+				}
+			],
+			"description": "Voice cloning management endpoints"
+		},
+		{
+			"name": "Metadata",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Health check endpoint with model loading status and GPU availability."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/health",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"healthy\",\n    \"models\": {\n        \"translation\": true,\n        \"tts\": true\n    },\n    \"device\": \"cuda\",\n    \"cuda_available\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Languages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/languages",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"languages"
+							]
+						},
+						"description": "Get list of supported languages for translation (NLLB-200) and TTS (XTTS-v2)."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/languages",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"languages"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"translation\": {\n        \"model\": \"NLLB-200\",\n        \"languages\": [\n            {\"code\": \"eng_Latn\", \"name\": \"English\"},\n            {\"code\": \"urd_Arab\", \"name\": \"Urdu\"},\n            {\"code\": \"hin_Deva\", \"name\": \"Hindi\"}\n        ]\n    },\n    \"tts\": {\n        \"model\": \"XTTS-v2\",\n        \"languages\": [\n            {\"code\": \"en\", \"name\": \"English\"},\n            {\"code\": \"es\", \"name\": \"Spanish\"},\n            {\"code\": \"fr\", \"name\": \"French\"}\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Voices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/voices",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"voices"
+							]
+						},
+						"description": "Get list of available cloned voices (same as /voice/list)."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/voices",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"voices"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"count\": 2,\n    \"voices\": [\n        {\n            \"user_id\": \"user_123\",\n            \"path\": \"app/storage/voices/user_123/voice.wav\",\n            \"available\": true\n        },\n        {\n            \"user_id\": \"user_456\",\n            \"path\": \"app/storage/voices/user_456/voice.wav\",\n            \"available\": true\n        }\n    ]\n}"
+						}
+					]
+				}
+			],
+			"description": "Metadata and utility endpoints"
+		},
+		{
+			"name": "Root",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "Root endpoint with API information"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}
