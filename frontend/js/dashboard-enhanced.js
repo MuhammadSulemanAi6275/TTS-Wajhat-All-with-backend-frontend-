@@ -36,9 +36,7 @@ window.onload = async function () {
   // Setup drag and drop for voice upload
   setupDragAndDrop();
 
-  // Load saved usage stats
-  const savedUsage = parseInt(localStorage.getItem('totalCharactersUsed') || '0');
-  updateUsageStats(savedUsage);
+  // Usage stats will be loaded from API
 };
 
 // ==========================================
@@ -299,11 +297,8 @@ async function generateVoiceTTS(event) {
     const data = await response.json();
 
     if (response.ok) {
-      // Update usage stats
-      const currentUsage = parseInt(localStorage.getItem('totalCharactersUsed') || '0');
-      const newUsage = currentUsage + text.length;
-      localStorage.setItem('totalCharactersUsed', newUsage.toString());
-      updateUsageStats(newUsage);
+      // Usage stats are updated on backend, refresh from API
+      // Note: Character usage is tracked server-side
 
       // Update character counter
       updateCharacterCount();
@@ -405,11 +400,8 @@ async function translateAndGenerateTTS() {
       // Show download button
       document.getElementById('combinedDownloadBtn').style.display = 'block';
 
-      // Update usage stats
-      const currentUsage = parseInt(localStorage.getItem('totalCharactersUsed') || '0');
-      const newUsage = currentUsage + text.length;
-      localStorage.setItem('totalCharactersUsed', newUsage.toString());
-      updateUsageStats(newUsage);
+      // Usage stats are updated on backend, refresh from API
+      // Note: Character usage is tracked server-side
 
       showMessage('success', 'Translation and TTS completed successfully!');
     } else {

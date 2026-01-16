@@ -20,11 +20,30 @@ def dashboard():
     try:
         identity = get_jwt_identity()
         user = User.query.get(int(identity))
-        if not user.plan_id:
-            return jsonify({"error": "No plan assigned by admin"}), 403
-
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        
+        # Get user's usage data
         usage = Usage.query.filter_by(user_id=user.id).first()
-        return usage_schema.jsonify(usage)
+        
+        # Prepare response with user and usage data
+        response_data = {
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "name": user.email.split('@')[0],  # Extract name from email
+                "user_type": user.user_type,
+                "plan_id": user.plan_id
+            },
+            "usage": {
+                "characters_used": usage.characters_used if usage else 0,
+                "characters_remaining": usage.characters_remaining if usage else 0,
+                "total_characters": user.plan.character_limit if user.plan else 0,
+                "last_generated_at": usage.last_generated_at.isoformat() if usage and usage.last_generated_at else None
+            }
+        }
+        
+        return jsonify(response_data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

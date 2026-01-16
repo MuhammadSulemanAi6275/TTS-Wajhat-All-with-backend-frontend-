@@ -178,9 +178,7 @@ window.onload = async function () {
   loadVoiceClones();
   loadProfilePicture();
 
-  // Load saved usage stats
-  const savedUsage = parseInt(localStorage.getItem('totalCharactersUsed') || '0');
-  updateUsageStats(savedUsage);
+  // Usage stats will be loaded from API in loadUserDashboard()
 };
 
 // Load user dashboard data from API
@@ -211,9 +209,17 @@ async function loadUserDashboard() {
 async function loadVoiceClones() {
   try {
     // Load clones from API
-    const response = await API.request('/voice/voices', {
+    const response = await fetch('https://136qzotuij1clc-8000.proxy.runpod.net/api/voice/voices', {
       method: 'GET',
-      headers: API.getAuthHeaders()
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt_token')?.replace('Bearer ', '')}`
+      }
+    }).then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
     });
     const clones = response || [];
 
@@ -273,47 +279,14 @@ async function loadVoiceClones() {
 
   } catch (error) {
     console.error('Failed to load voice clones:', error);
-    // Fallback to local storage
-    loadVoiceClonesLocal();
+    // No fallback to local storage - only API clones are shown for user isolation
   }
 }
 
 // Fallback function for local voice clones
 function loadVoiceClonesLocal() {
-  const clones = JSON.parse(localStorage.getItem('voiceClones') || '[]');
-  const voiceCloneDropdown = document.querySelector('[data-dropdown="voice-clone"] .dropdown-options');
-
-  if (voiceCloneDropdown) {
-    // Clear existing dynamic options (keep only default ones)
-    const defaultOptions = voiceCloneDropdown.querySelectorAll('.dropdown-option');
-    const defaultCloneNames = ['naveed', 'shahzad', 'naveed-m', 'naveed-i', 'mrc', 'm-r'];
-
-    // Remove non-default options
-    defaultOptions.forEach(option => {
-      const value = option.getAttribute('data-value');
-      if (!defaultCloneNames.includes(value)) {
-        option.remove();
-      }
-    });
-
-    // Add saved clones to dropdown
-    clones.forEach(clone => {
-      const option = document.createElement('div');
-      option.className = 'dropdown-option';
-      option.setAttribute('data-value', clone.name.toLowerCase().replace(/\s+/g, '-'));
-      option.innerHTML = `
-        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-        </svg>
-        ${clone.name} (${clone.gender})
-      `;
-      voiceCloneDropdown.appendChild(option);
-    });
-
-    // Re-setup dropdown functionality for new options
-    setupDropdowns();
-  }
+  // No longer using localStorage for voice clones
+  // Only API-based clones are shown to ensure user isolation
 }
 
 // Voice generation functionality with API integration
@@ -370,7 +343,7 @@ async function generateVoice(event) {
       voice_model: voiceModel
     };
 
-    const response = await fetch(`${API_CONFIG.BASE_URL}/voice/generate`, {
+    const response = await fetch(`https://136qzotuij1clc-8000.proxy.runpod.net/api/voice/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -400,11 +373,8 @@ async function generateVoice(event) {
 
     const responseData = await response.json();
 
-    // Update usage stats with generated text length
-    const currentUsage = parseInt(localStorage.getItem('totalCharactersUsed') || '0');
-    const newUsage = currentUsage + text.length;
-    localStorage.setItem('totalCharactersUsed', newUsage.toString());
-    updateUsageStats(newUsage);
+    // Usage stats are updated on backend, refresh from API
+    await loadUserDashboard();
 
     // Update character counter
     updateCharacterCount();
@@ -423,7 +393,7 @@ async function generateVoice(event) {
       // Load audio using fetch with proper auth headers, then set as source
       if (responseData.audio_id) {
         // Fetch the audio blob with proper authorization
-        fetch(`${API_CONFIG.BASE_URL}/voice/stream/${responseData.audio_id}`, {
+        fetch(`https://136qzotuij1clc-8000.proxy.runpod.net/api/voice/stream/${responseData.audio_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token.replace('Bearer ', '')}`
@@ -574,7 +544,7 @@ async function downloadMP3(event) {
     console.log('Starting download process...', { audioId });
 
     // Download via API with audio ID
-    const response = await fetch(`${API_CONFIG.BASE_URL}/voice/download/${audioId}`, {
+    const response = await fetch(`https://136qzotuij1clc-8000.proxy.runpod.net/api/voice/download/${audioId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token.replace('Bearer ', '')}`,

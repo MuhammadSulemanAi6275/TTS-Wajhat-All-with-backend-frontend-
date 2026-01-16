@@ -139,15 +139,8 @@ function createCloneCard(name, gender, language, cloneId = null) {
 
 // Function to update dashboard dropdown with new clone
 function updateDashboardDropdown(name, gender) {
-  // Store clone data in localStorage
-  let clones = JSON.parse(localStorage.getItem('voiceClones') || '[]');
-  
-  // Check if clone already exists
-  const existingClone = clones.find(clone => clone.name === name);
-  if (!existingClone) {
-    clones.push({ name, gender, language: document.getElementById('cloneLanguage').value });
-    localStorage.setItem('voiceClones', JSON.stringify(clones));
-  }
+  // Note: We rely on server-side storage only now, no client-side storage
+  // The API will handle storing and retrieving user-specific voice clones
 }
 
 // Function to update profile UI
@@ -227,10 +220,7 @@ async function deleteClone(cloneName, cloneId) {
         }
       });
       
-      // Remove from localStorage
-      let clones = JSON.parse(localStorage.getItem('voiceClones') || '[]');
-      clones = clones.filter(clone => clone.name !== cloneName);
-      localStorage.setItem('voiceClones', JSON.stringify(clones));
+      // LocalStorage removal is no longer needed - server handles this
       
       console.log(`Deleted clone: ${cloneName}`);
       
@@ -390,54 +380,7 @@ async function loadSavedClones() {
     });
     
   } catch (error) {
-    console.error('Failed to load clones from API:', error);
-    // Fallback to localStorage
-    loadLocalClones();
+    console.error('Failed to load voice clones from API:', error);
+    alert('Failed to load voice clones: ' + error.message);
   }
-}
-
-// Fallback function to load from localStorage
-function loadLocalClones() {
-  const savedClones = JSON.parse(localStorage.getItem('voiceClones') || '[]');
-  const clonesGrid = document.querySelector('.clones-grid');
-  
-  savedClones.forEach(clone => {
-    const cloneCard = document.createElement('div');
-    cloneCard.className = 'clone-card';
-    cloneCard.innerHTML = `
-      <div class="clone-header">
-        <div class="clone-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#4ecca3" stroke-width="2">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-          </svg>
-        </div>
-        <h3 class="clone-name">${clone.name}</h3>
-        <button class="delete-btn" onclick="deleteClone('${clone.name}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3,6 5,6 21,6"></polyline>
-            <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="clone-details">
-        <div class="clone-info">
-          <span class="info-label">Gender</span>
-          <span class="info-value">${clone.gender}</span>
-        </div>
-        <div class="clone-info">
-          <span class="info-label">Language</span>
-          <span class="info-value">${getLanguageName(clone.language)}</span>
-        </div>
-        <div class="clone-feature">
-          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="#4ecca3" stroke-width="2">
-            <polygon points="12 2 15.09 8.26 22 9 17 14.74 18.18 21.02 12 17.77 5.82 21.02 7 14.74 2 9 8.91 8.26 12 2"></polygon>
-          </svg>
-          <span>Ultra-Realistic Voice Enabled</span>
-        </div>
-      </div>
-    `;
-    
-    clonesGrid.appendChild(cloneCard);
-  });
 }
